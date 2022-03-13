@@ -25,6 +25,7 @@
 		"typescript": "^3.8.3"
 	},
 	"dependencies": {
+		"grid-engine": "^2.13.0",
 		"phaser": "^3.55.2"
 	},
 	"parcelCleanPaths": [
