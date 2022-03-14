@@ -32,7 +32,6 @@ export default class HelloWorldScene extends Phaser.Scene {
         const item = map.createLayer('item', tileset);
         const buildingLow = map.createLayer('Building Low', tileset);
         const treeTrunk = map.createLayer('tree trunk', tileset);
-        const signBoards = map.createLayer('Sign', tileset);
         
         // Note: Order is importatnt here, hero must be created before high-rise object (tree tops, high buildings)
         // This will make sure that the high-rise object will cover the hero; looks more realistic
@@ -102,7 +101,6 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.physics.add.collider(this.hero, mountain);
         this.physics.add.collider(this.hero, lake);
         this.physics.add.collider(this.hero, landscape);
-        this.physics.add.collider(this.hero, signBoards);
         this.physics.add.collider(this.hero, walls);
 
         treeTrunk.setCollisionBetween(0, 9999);
@@ -110,7 +108,16 @@ export default class HelloWorldScene extends Phaser.Scene {
         mountain.setCollisionBetween(0, 9999);
         lake.setCollisionBetween(0, 9999);
         walls.setCollisionBetween(0, 9999);
-        signBoards.setCollisionBetween(0, 9999);
+
+        const signPostObjects = map.getObjectLayer('SignPost');
+        signPostObjects.objects.forEach(signPost => {
+            const obj = this.add.rectangle(signPost.x! + (signPost.width!/2), signPost.y! - (signPost.height!/2), signPost.width, signPost.height, 0xff0000, 0.4);
+
+            this.physics.world.enable(obj, 1);
+            this.physics.add.collider(this.hero, obj, () => {
+                console.log(signPost.name);
+            });
+        });
 
     }
 
