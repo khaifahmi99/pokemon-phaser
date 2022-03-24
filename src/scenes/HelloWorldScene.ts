@@ -1,7 +1,11 @@
 import Phaser, { Types } from 'phaser'
-
+import TextBox from 'phaser3-rex-plugins/templates/ui/textbox/TextBox';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import { HEIGHT, WIDTH } from '~/main';
 export default class HelloWorldScene extends Phaser.Scene {
     private hero!: Types.Physics.Arcade.SpriteWithDynamicBody;
+    private rexUI!: RexUIPlugin;
+    private textBox!: TextBox;
     private velocity: number = 192;
     private frameRate: number = 16;
 
@@ -39,6 +43,14 @@ export default class HelloWorldScene extends Phaser.Scene {
 
         const treeTop = map.createLayer('tree top', tileset);
         const buildingHigh = map.createLayer('Building High', tileset);
+
+        const background = this.rexUI.add.roundRectangle(0, 0, WIDTH - 64, 200, 20, 0x4e342e);
+        this.textBox = this.rexUI.add.textBox({
+            background: background, 
+            text: this.add.text(-WIDTH/2 + 64, -64, 'Welcome to the Pokemon World. Here, you just need to catch\'em all. Good luck', {
+                fontSize: '24px'
+            }),
+        });
 
         this.anims.create({
             key: 'idle_right',
@@ -103,6 +115,11 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.physics.add.collider(this.hero, landscape);
         this.physics.add.collider(this.hero, walls);
 
+        this.physics.world.bounds.width = map.widthInPixels;
+        this.physics.world.bounds.height = map.heightInPixels;
+
+        this.hero.setCollideWorldBounds(true);
+
         treeTrunk.setCollisionBetween(0, 9999);
         buildingLow.setCollisionBetween(0, 9999);
         mountain.setCollisionBetween(0, 9999);
@@ -111,11 +128,18 @@ export default class HelloWorldScene extends Phaser.Scene {
 
         const signPostObjects = map.getObjectLayer('SignPost');
         signPostObjects.objects.forEach(signPost => {
-            const obj = this.add.rectangle(signPost.x! + (signPost.width!/2), signPost.y! - (signPost.height!/2), signPost.width, signPost.height, 0xff0000, 0.4);
+            const obj = this.add.rectangle(signPost.x! + (signPost.width!/2), signPost.y! - (signPost.height!/2), signPost.width, signPost.height, 0xff0000, 0);
 
             this.physics.world.enable(obj, 1);
             this.physics.add.collider(this.hero, obj, () => {
                 console.log(signPost.name);
+                this.textBox.setText(signPost.name);
+                this.textBox.setAlpha(1);
+
+                setTimeout(() => {
+                    this.textBox.setText('');
+                    this.textBox.setAlpha(0);
+                }, 5_000)
             });
         });
 
@@ -123,6 +147,10 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     update() {
         const cursors = this.input.keyboard.createCursorKeys();
+
+        const textboxX = this.hero.x + 32;
+
+        this.textBox.setX(textboxX).setY(this.hero.y + HEIGHT/2 - 64);
 
         if (cursors.left.isDown) {
             this.hero.setVelocity(-this.velocity, 0);
