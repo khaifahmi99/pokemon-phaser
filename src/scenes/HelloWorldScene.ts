@@ -2,7 +2,7 @@ import Phaser, { Types } from 'phaser'
 
 export default class HelloWorldScene extends Phaser.Scene {
     private hero!: Types.Physics.Arcade.SpriteWithDynamicBody;
-    private velocity: number = 200;
+    private velocity: number = 192;
     private frameRate: number = 16;
 
 	constructor() {
@@ -35,7 +35,7 @@ export default class HelloWorldScene extends Phaser.Scene {
         
         // Note: Order is importatnt here, hero must be created before high-rise object (tree tops, high buildings)
         // This will make sure that the high-rise object will cover the hero; looks more realistic
-        this.hero = this.physics.add.sprite(2750, 1800, 'hero').setScale(1);
+        this.hero = this.physics.add.sprite(2752, 1760, 'hero').setScale(1);
 
         const treeTop = map.createLayer('tree top', tileset);
         const buildingHigh = map.createLayer('Building High', tileset);
