@@ -9,8 +9,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     private velocity: number = 192;
     private frameRate: number = 16;
 
+    private isTextBoxOpen!: boolean;
+
 	constructor() {
 		super('hello-world')
+        this.isTextBoxOpen = true;
 	}
 
     preload() {
@@ -24,6 +27,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     }
 
     create() {
+        console.log('inside level1 scene');
         const map = this.make.tilemap({ key: 'tilemap' });
         const tileset = map.addTilesetImage('Outside', 'base_tiles');
 
@@ -132,20 +136,43 @@ export default class HelloWorldScene extends Phaser.Scene {
 
             this.physics.world.enable(obj, 1);
             this.physics.add.collider(this.hero, obj, () => {
-                console.log(signPost.name);
                 this.textBox.setText(signPost.name);
-                this.textBox.setAlpha(1);
+                this.isTextBoxOpen = true;
 
                 setTimeout(() => {
                     this.textBox.setText('');
-                    this.textBox.setAlpha(0);
-                }, 5_000)
+                    this.isTextBoxOpen = false;
+                }, 2_000)
             });
         });
 
+        const doors = map.getObjectLayer('Doors');
+        doors.objects.forEach(door => {
+            const obj = this.add.rectangle(door.x! + (door.width!/2), door.y! - (door.height!/2), door.width, door.height, 0xff0000, 0);
+            this.physics.world.enable(obj, 1);
+
+            this.physics.add.collider(this.hero, obj, () => {
+                if (door.type === 'Unlocked') {
+                    console.log(`Changing scene to ${door.name}`);
+                    this.scene.start(door.name);
+                } else {
+                    console.log(`You cannot enter ${door.name}`);
+                }
+            })
+        });
+
+        this.input.keyboard.on('keydown-A', () => {
+            this.isTextBoxOpen = !this.isTextBoxOpen;
+        });
     }
 
     update() {
+        if (this.isTextBoxOpen && this.textBox.text !== '') {
+            this.textBox.setAlpha(1);
+        } else {
+            this.textBox.setAlpha(0);
+        }
+
         const cursors = this.input.keyboard.createCursorKeys();
 
         const textboxX = this.hero.x + 32;
