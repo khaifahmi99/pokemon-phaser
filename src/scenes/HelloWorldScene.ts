@@ -1,7 +1,9 @@
-import Phaser, { Types } from 'phaser'
+import Phaser, { Scenes, Types } from 'phaser'
 import TextBox from 'phaser3-rex-plugins/templates/ui/textbox/TextBox';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import { Scene } from '~/constant';
 import { HEIGHT, WIDTH } from '~/main';
+import { SceneData } from '~/type';
 export default class HelloWorldScene extends Phaser.Scene {
     private hero!: Types.Physics.Arcade.SpriteWithDynamicBody;
     private rexUI!: RexUIPlugin;
@@ -26,8 +28,7 @@ export default class HelloWorldScene extends Phaser.Scene {
         });
     }
 
-    create() {
-        console.log('inside level1 scene');
+    create(data: SceneData) {
         const map = this.make.tilemap({ key: 'tilemap' });
         const tileset = map.addTilesetImage('Outside', 'base_tiles');
 
@@ -43,7 +44,8 @@ export default class HelloWorldScene extends Phaser.Scene {
         
         // Note: Order is importatnt here, hero must be created before high-rise object (tree tops, high buildings)
         // This will make sure that the high-rise object will cover the hero; looks more realistic
-        this.hero = this.physics.add.sprite(2752, 1760, 'hero').setScale(1);
+        const [x, y] = this.initialPosition(data.from);
+        this.hero = this.physics.add.sprite(x, y, 'hero').setScale(1);
 
         const treeTop = map.createLayer('tree top', tileset);
         const buildingHigh = map.createLayer('Building High', tileset);
@@ -153,8 +155,9 @@ export default class HelloWorldScene extends Phaser.Scene {
 
             this.physics.add.collider(this.hero, obj, () => {
                 if (door.type === 'Unlocked') {
-                    console.log(`Changing scene to ${door.name}`);
-                    this.scene.start(door.name);
+                    this.scene.start(door.name, {
+                        from: Scene.HelloWorld,
+                    });
                 } else {
                     console.log(`You cannot enter ${door.name}`);
                 }
@@ -195,5 +198,24 @@ export default class HelloWorldScene extends Phaser.Scene {
             this.hero.setVelocity(0, 0);
             this.hero.play('idle_down', true);
         }
+    }
+
+    initialPosition(locationFrom: string) {
+        let x = 2752;
+        let y = 1760;
+        switch (locationFrom) {
+            case Scene.Cave:
+                x = 2290;
+                y = 470;
+                break;
+            case Scene.Store:
+                x = 2064;
+                y = 1830;
+                break;
+            default:
+                break;
+        }
+
+        return [x, y];
     }
 }

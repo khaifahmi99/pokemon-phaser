@@ -1,4 +1,5 @@
 import { Types } from "phaser";
+import { Scene } from "~/constant";
 
 export default class StoreScene extends Phaser.Scene {
   private hero!: Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -20,7 +21,6 @@ export default class StoreScene extends Phaser.Scene {
   }
 
   create() {
-    console.log('inside warehouse scene');
     const map = this.make.tilemap({ key: 'store' });
     const tileset = map.addTilesetImage('Outside', 'base_tiles');
 
@@ -96,7 +96,7 @@ export default class StoreScene extends Phaser.Scene {
 
         this.physics.add.collider(this.hero, obj, () => {
           if (door.name === 'Exit') {
-            this.scene.start('hello-world');
+            this.scene.start('hello-world', { from: Scene.Store });
           }
         })
     });

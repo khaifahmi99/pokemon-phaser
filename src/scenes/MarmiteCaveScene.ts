@@ -1,4 +1,5 @@
 import { Types } from "phaser";
+import { Scene } from "~/constant";
 
 export default class MarmiteCaveScene extends Phaser.Scene {
   private hero!: Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -20,7 +21,6 @@ export default class MarmiteCaveScene extends Phaser.Scene {
   }
 
   create() {
-    console.log('inside warehouse scene');
     const map = this.make.tilemap({ key: 'cave' });
     const tileset = map.addTilesetImage('Outside', 'base_tiles');
 
@@ -97,7 +97,7 @@ export default class MarmiteCaveScene extends Phaser.Scene {
 
         this.physics.add.collider(this.hero, obj, () => {
           if (door.name === 'Exit') {
-            this.scene.start('hello-world');
+            this.scene.start('hello-world', { from: Scene.Cave });
           }
         })
     });
